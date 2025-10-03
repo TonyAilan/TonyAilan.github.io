@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tony Ailan - Galería de Arte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial Black', Arial, sans-serif;
+            background: linear-gradient(to bottom, #0a0a2e 0%, #1a0a3e 50%, #2a0a4e 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 10%, rgba(139, 0, 139, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(148, 0, 211, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Página principal */
+        #mainPage {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 60px;
+            align-items: center;
+            min-height: 90vh;
+            padding: 40px;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo {
+            width: 100%;
+            max-width: 600px;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.5));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .menu-btn {
+            background: linear-gradient(135deg, #ff00ff 0%, #ff0099 100%);
+            border: 4px solid #00ffff;
+            padding: 40px 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: black;
+            cursor: pointer;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .menu-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+            background: linear-gradient(135deg, #ff00ff 0%, #ff0099 100%);
+        }
+
+        /* Página de galería */
+        #galleryPage {
+            display: none;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #00ffff 0%, #0099ff 100%);
+            border: 3px solid #ff00ff;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: black;
+            cursor: pointer;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+        }
+
+        .gallery-title {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff00ff;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        }
+
+        .gallery-description {
+            text-align: center;
+            font-size: 18px;
+            line-height: 1.8;
+            color: #ffffff;
+            margin-bottom: 40px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 30px;
+            background: rgba(255, 0, 255, 0.1);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Grid inteligente que se centra cuando hay pocas imágenes */
+        .gallery-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* Estilos para imágenes horizontales */
+        .gallery-item.horizontal {
+            width: calc(45% - 15px);
+            max-width: 500px;
+        }
+
+        /* Estilos para imágenes verticales */
+        .gallery-item.vertical {
+            width: calc(28% - 20px);
+            max-width: 320px;
+        }
+
+        /* Estilos para imágenes cuadradas */
+        .gallery-item.square {
+            width: calc(30% - 20px);
+            max-width: 350px;
+        }
+
+        .gallery-item {
+            position: relative;
+            background: linear-gradient(135deg, #1a0a3e 0%, #2a0a4e 100%);
+            border: 3px solid #00ffff;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
+            border-color: #ff00ff;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            #mainPage {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 20px;
+            }
+
+            .logo {
+                max-width: 450px;
+            }
+
+            .gallery-item.horizontal,
+            .gallery-item.vertical,
+            .gallery-item.square {
+                width: calc(50% - 15px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                max-width: 350px;
+            }
+
+            .menu {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .menu-btn {
+                font-size: 20px;
+                padding: 30px 20px;
+            }
+
+            .gallery-title {
+                font-size: 32px;
+            }
+
+            .gallery-description {
+                font-size: 16px;
+                padding: 20px;
+            }
+
+            .gallery-item.horizontal,
+            .gallery-item.vertical,
+            .gallery-item.square {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Página Principal -->
+        <div id="mainPage">
+            <div class="logo-container">
+                <img class="logo" src="imagenes/logo.png" alt="Tony Ailan Logo">
+            </div>
+
+            <div class="menu-container">
+                <div class="menu">
+                    <button class="menu-btn" onclick="navigateToGallery('merch')">Prints y<br>Merch</button>
+                    <button class="menu-btn" onclick="navigateToGallery('oro')">Pinturas<br>Oro</button>
+                    <button class="menu-btn" onclick="navigateToGallery('platino')">Pinturas<br>Platino</button>
+                    <button class="menu-btn" onclick="navigateToGallery('diamante')">Pinturas<br>Diamante</button>
+                    <button class="menu-btn" onclick="navigateToGallery('fotografia')">Fotografía</button>
+                    <button class="menu-btn" onclick="navigateToGallery('render')">Render<br>Artístico</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página de Galería -->
+        <div id="galleryPage">
+            <button class="back-btn" onclick="navigateToMain()">← VOLVER AL INICIO</button>
+            <h1 class="gallery-title" id="galleryTitle"></h1>
+            <div class="gallery-description" id="galleryDescription"></div>
+            <div class="gallery-grid" id="galleryGrid"></div>
+        </div>
+    </div>
+
+    <script>
+        const galleries = {
+            merch: [
+                { title: "Bolsas", image: "imagenes/merch/bolsas.png" },
+                { title: "Prints", image: "imagenes/merch/printsciclocosmico.png" }
+            ],
+            oro: [
+                { title: "Aurora Dorada", image: "imagenes/oro/B1.png" },
+                { title: "Reflejos Eternos", image: "imagenes/oro/B2.png" },
+                { title: "Constelación Urbana", image: "imagenes/oro/B3.png" },
+                { title: "Sueños de Oro", image: "imagenes/oro/B4.png" },
+                { title: "Ecos de Luz", image: "imagenes/oro/ElDavid.png" },
+                { title: "Horizonte Dorado", image: "imagenes/oro/Formasuniversales.png" },
+                { title: "Reflejo Místico", image: "imagenes/oro/Guerrerosdetula.png" },
+                { title: "Luz Eterna", image: "imagenes/oro/instituto.png" },
+                { title: "Oasis Dorado", image: "imagenes/oro/M-KJ7.png" },
+                { title: "Brillo Celestial", image: "imagenes/oro/M-KJ8.png" },
+                { title: "Ritmos Dorados", image: "imagenes/oro/M-KJ9.png" },
+                { title: "Destellos Urbanos", image: "imagenes/oro/Ocelotlnorte45.png" }
+            ],
+            platino: [
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/Billie.png" },
+                { title: "Dimensiones Paralelas", image: "imagenes/platino/blueSkull.png" },
+                { title: "Sinfonía Eléctrica", image: "imagenes/platino/Instituto.png" },
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/KurtCobain.png" },
+                { title: "Dimensiones Paralelas", image: "imagenes/platino/M-KJ1.png" },
+                { title: "Sinfonía Eléctrica", image: "imagenes/platino/M-KJ2.png" },
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/M-KJ3.png" },
+                { title: "Dimensiones Paralelas", image: "imagenes/platino/M-KJ4.png" },
+                { title: "Sinfonía Eléctrica", image: "imagenes/platino/M-KJ5.png" },
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/M-KJ6.png" },
+                { title: "Dimensiones Paralelas", image: "imagenes/platino/M-KJ10.png" },
+                { title: "Sinfonía Eléctrica", image: "imagenes/platino/M-KJ77.png" },
+                { title: "Dimensiones Paralelas", image: "imagenes/platino/MusicoCicladicos.png" },
+                { title: "Sinfonía Eléctrica", image: "imagenes/platino/ReplicaAfterThebath.png" },
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/RM.png" },
+                { title: "Dimensiones Paralelas", image: "imagenes/platino/TheWarning.png" },
+                { title: "Sinfonía Eléctrica", image: "imagenes/platino/Venus.png" },
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/heroe.jpeg" },
+                { title: "Metrópolis Nocturna", image: "imagenes/platino/calaveraVerde.jpeg" },
+                { title: "Luz Prismática", image: "imagenes/platino/idolo.png" },
+                { title: "Nebulosa de Sueños", image: "imagenes/platino/PugilReposo.png" }
+            ],
+            diamante: [
+                { title: "Cosmos Infinito", image: "imagenes/diamante/Ciclocosmico.png" },
+                { title: "Trascendencia Digital", image: "imagenes/diamante/Espartano.png" },
+                { title: "Energía Radiante", image: "imagenes/diamante/Globos.png" }
+            ],
+            fotografia: [
+                { title: "Fotografía 1", image: "imagenes/fotografia/AtlantesdetulaenAzcapotzalco.png" },
+                { title: "Fotografía 2", image: "imagenes/fotografia/EscaleraMistica.png" },
+                { title: "Fotografía 3", image: "imagenes/fotografia/gatochilango.png" },
+                { title: "Fotografía 4", image: "imagenes/fotografia/Institutodelpetroleo.png" },
+                { title: "Fotografía 5", image: "imagenes/fotografia/NacimientoenPolanco.png" },
+                { title: "Fotografía 6", image: "imagenes/fotografia/nopal-zoom.png" },
+                { title: "Fotografía 7", image: "imagenes/fotografia/nopalpink.png" },
+                { title: "Fotografía 8", image: "imagenes/fotografia/OcelotlenNorte45.png" }
+            ],
+            render: [
+                { title: "Render 1", image: "imagenes/render/ArquitecturaparaCuernavaca.png" },
+                { title: "Render 2", image: "imagenes/render/AuditorioPlateado.png" },
+                { title: "Render 3", image: "imagenes/render/Cabañaenestacion.png" },
+                { title: "Render 4", image: "imagenes/render/FachadaValledeloscastillos.png" },
+                { title: "Render 5", image: "imagenes/render/Puentesyarcos.png" }
+            ]
+        };
+
+        const titles = {
+            merch: 'Prints y Merch',
+            oro: 'Colección Oro',
+            platino: 'Colección Platino',
+            diamante: 'Colección Diamante',
+            fotografia: 'Fotografía',
+            render: 'Renders Artísticos'
+        };
+
+        const descriptions = {
+            merch: 'El arte también puede vivir en lo cotidiano. En esta sección encontrarás prints, stickers y otros artículos inspirados en mi trabajo, pensados para que puedas llevar un fragmento de mi universo creativo contigo o integrarlo a tu espacio.<br><br>Cada pieza de merch es una extensión de mis pinturas, dibujos y fotografías: un puente entre la obra y la vida diaria. No son simples objetos, sino pequeñas formas de compartir la estética, los colores y las ideas que me inspiran.<br><br>Aquí el arte se vuelve accesible, portátil y cercano, listo para acompañarte en tu día a día.',
+            oro: 'La Sección Oro reúne obras creadas desde la libertad y la intuición. Son piezas que surgen de dejarse llevar, sin perseguir la perfección, y que encuentran su fuerza justamente en esa frescura.<br><br>Cada una es un experimento en sí mismo, con su propia personalidad y carácter. No son obras "menores", sino expresiones auténticas que guardan la belleza de lo inesperado.<br><br>Aquí descubrirás fragmentos de creatividad pura: honestos, únicos y con un valor que está en lo que transmiten, no en lo que se tardaron en hacerse.',
+            platino: 'Colección premium de obras que utilizan platino y metales nobles para crear efectos lumínicos únicos. Piezas de gran formato que transforman cualquier espacio en una galería de arte contemporáneo.',
+            diamante: 'La colección más exclusiva y ambiciosa. Obras monumentales que incorporan cristales Swarovski y materiales de la más alta calidad. Cada pieza es una inversión en arte de nivel museo.',
+            fotografia: 'La fotografía, para mí, es un acto de detener el tiempo y enmarcar aquello que considero bello. No busco documentar la realidad tal cual es, sino interpretarla: capturar un instante y luego realzarlo a través de la edición, hasta que refleje la emoción con la que lo vi.<br><br>Cada imagen es un diálogo entre lo que aparece frente a la lente y lo que quiero compartir. No son simples registros, son pequeñas atmósferas donde la luz, el color y la composición se unen para resaltar la belleza de lo cotidiano y lo extraordinario.<br><br>En esta colección encontrarás fragmentos de mi mirada: instantes transformados en imágenes que, espero, transmitan la misma fascinación que me llevó a capturarlos.',
+            render: 'Estos renders no buscan ser una representación técnica exacta, sino una interpretación artística de la arquitectura. Me interesa capturar la atmósfera de un espacio, su carácter y la emoción que puede transmitir, más allá de mostrar únicamente formas y materiales.<br><br>La mayoría nacen de proyectos universitarios, pero esta colección no se limita a ellos: estoy abierto a recrear edificios existentes y también a experimentar inventando nuevas arquitecturas.<br><br>Cada render es un ejercicio de imaginación y sensibilidad, donde la luz, el entorno y la composición construyen imágenes que se acercan más a lo pictórico que a lo digital. Son escenarios que invitan a ver la arquitectura no solo como un diseño funcional, sino como una experiencia visual y artística.'
+        };
+
+        // Función para detectar orientación de imagen
+        function detectImageOrientation(img) {
+            return new Promise((resolve) => {
+                const tempImg = new Image();
+                tempImg.onload = function() {
+                    const ratio = this.width / this.height;
+                    let orientation;
+                    
+                    if (ratio > 1.3) {
+                        orientation = 'horizontal';
+                    } else if (ratio < 0.7) {
+                        orientation = 'vertical';
+                    } else {
+                        orientation = 'square';
+                    }
+                    
+                    resolve(orientation);
+                };
+                tempImg.src = img;
+            });
+        }
+
+        // Mostrar galería con detección de orientación
+        async function showGallery(category) {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('galleryPage').style.display = 'block';
+            document.getElementById('galleryTitle').textContent = titles[category];
+            document.getElementById('galleryDescription').innerHTML = descriptions[category];
+
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = '';
+
+            for (const item of galleries[category]) {
+                const orientation = await detectImageOrientation(item.image);
+                
+                const div = document.createElement('div');
+                div.className = `gallery-item ${orientation}`;
+                div.innerHTML = `<img src="${item.image}" alt="${item.title}">`;
+                
+                grid.appendChild(div);
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        function showMain() {
+            document.getElementById('mainPage').style.display = 'grid';
+            document.getElementById('galleryPage').style.display = 'none';
+            window.scrollTo(0, 0);
+        }
+
+        // Sistema de navegación con historial
+        function navigateToGallery(category) {
+            history.pushState({ page: 'gallery', category: category }, '', `#${category}`);
+            showGallery(category);
+        }
+
+        function navigateToMain() {
+            history.pushState({ page: 'main' }, '', '#');
+            showMain();
+        }
+
+        // Manejar botón atrás del navegador
+        window.addEventListener('popstate', function(event) {
+            if (event.state) {
+                if (event.state.page === 'gallery') {
+                    showGallery(event.state.category);
+                } else {
+                    showMain();
+                }
+            } else {
+                showMain();
+            }
+        });
+
+        // Cargar galería si hay hash en la URL
+        window.addEventListener('load', function() {
+            const hash = window.location.hash.substring(1);
+            if (hash && galleries[hash]) {
+                showGallery(hash);
+            }
+        });
+    </script>
+</body>
+
+</html>
